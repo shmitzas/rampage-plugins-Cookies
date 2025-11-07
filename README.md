@@ -22,6 +22,10 @@
 - Use the `dotnet publish -c Release` command to build and package your plugin.
 - Distribute the generated zip file or the contents of the `build/publish` directory.
 
+## Database Connection Key
+
+The database connection is using the key `cookies`. It supports only MySQL, MariaDB and PostgreSQL.
+
 ## API Reference
 
 The Cookies plugin provides two main APIs for managing persistent variables:
