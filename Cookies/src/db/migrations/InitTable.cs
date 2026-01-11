@@ -10,7 +10,7 @@ public class InitTable : Migration
         Create.Table("PlayerCookies")
             .WithColumn("Id").AsInt32().PrimaryKey().Identity()
             .WithColumn("SteamId64").AsInt64().NotNullable()
-            .WithColumn("Data").AsFixedLengthString(16384).NotNullable().WithDefaultValue("{}");
+            .WithColumn("Data").AsFixedLengthString(16384).NotNullable();
     }
 
     public override void Down()

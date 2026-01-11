@@ -2,9 +2,9 @@ using System.Collections.Concurrent;
 using Cookies.API;
 using Cookies.Contract;
 using Cookies.Database;
+using Microsoft.Extensions.Logging;
 using SwiftlyS2.Shared;
 using SwiftlyS2.Shared.Events;
-using SwiftlyS2.Shared.Natives;
 using SwiftlyS2.Shared.Players;
 using SwiftlyS2.Shared.Plugins;
 
@@ -24,10 +24,16 @@ public partial class Cookies : BasePlugin
 
     public Cookies(ISwiftlyCore core) : base(core)
     {
-        var connection = core.Database.GetConnection("cookies");
-        var connectionString = core.Database.GetConnectionString("cookies");
+        try
+        {
+            var connection = core.Database.GetConnection("cookies");
 
-        MigrationRunner.RunMigrations(connection, connectionString);
+            MigrationRunner.RunMigrations(connection);
+        }
+        catch (Exception e)
+        {
+            core.Logger.LogError(e, $"[Cookies] Failed to initialize database migrations.");
+        }
     }
 
     public override void ConfigureSharedInterface(IInterfaceManager interfaceManager)
@@ -96,7 +102,7 @@ public partial class Cookies : BasePlugin
     {
         if (saveTaskCancellationTokenSource != null) saveTaskCancellationTokenSource.Cancel();
 
-        saveTaskCancellationTokenSource = Core.Scheduler.RepeatBySeconds(10, () =>
+        saveTaskCancellationTokenSource = Core.Scheduler.RepeatBySeconds(1f, () =>
         {
             Task.Run(() =>
             {
