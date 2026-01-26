@@ -22,6 +22,26 @@ public interface IPlayerCookiesAPIv1
     public T? Get<T>(long steamid, string key);
 
     /// <summary>
+    /// Gets a variable from the player's data storage, or returns a default value if it doesn't exist.
+    /// </summary>
+    /// <typeparam name="T">The type of the variable.</typeparam>
+    /// <param name="player">The player object.</param>
+    /// <param name="key">The key of the variable.</param>
+    /// <param name="defaultValue">The default value to return if the variable doesn't exist.</param>
+    /// <returns>The value of the variable, or the default value if it doesn't exist.</returns>
+    public T? GetOrDefault<T>(IPlayer player, string key, T defaultValue);
+
+    /// <summary>
+    /// Gets a variable from the player's data storage by steamid, or returns a default value if it doesn't exist.
+    /// </summary>
+    /// <typeparam name="T">The type of the variable.</typeparam>
+    /// <param name="steamid">The steamid of the player.</param>
+    /// <param name="key">The key of the variable.</param>
+    /// <param name="defaultValue">The default value to return if the variable doesn't exist.</param>
+    /// <returns>The value of the variable, or the default value if it doesn't exist.</returns>
+    public T? GetOrDefault<T>(long steamid, string key, T defaultValue);
+
+    /// <summary>
     /// Checks if a variable exists in the player's data storage.
     /// </summary>
     /// <param name="key">The key of the variable.</param>

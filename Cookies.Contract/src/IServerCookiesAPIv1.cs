@@ -11,6 +11,15 @@ public interface IServerCookiesAPIv1
     public T? Get<T>(string key);
 
     /// <summary>
+    /// Gets a variable from the server's data storage, or returns a default value if it doesn't exist.
+    /// </summary>
+    /// <typeparam name="T">The type of the variable.</typeparam>
+    /// <param name="key">The key of the variable.</param>
+    /// <param name="defaultValue">The default value to return if the variable doesn't exist.</param>
+    /// <returns>The value of the variable, or the default value if it doesn't exist.</returns>
+    public T? GetOrDefault<T>(string key, T defaultValue);
+
+    /// <summary>
     /// Checks if a variable exists in the server's data storage.
     /// </summary>
     /// <param name="key">The key of the variable.</param>

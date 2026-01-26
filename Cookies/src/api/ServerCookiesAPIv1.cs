@@ -60,6 +60,16 @@ public class ServerCookiesAPIv1 : IServerCookiesAPIv1
         return default;
     }
 
+    public T? GetOrDefault<T>(string key, T defaultValue)
+    {
+        if (!Has(key))
+        {
+            Set(key, defaultValue);
+            return defaultValue;
+        }
+        else return Get<T>(key);
+    }
+
     public bool Has(string key)
     {
         return CachedCookies.ContainsKey(-1) && CachedCookies[-1].ContainsKey(key);

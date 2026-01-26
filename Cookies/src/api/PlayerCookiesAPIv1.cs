@@ -132,6 +132,21 @@ public class PlayerCookiesAPIv1 : IPlayerCookiesAPIv1
         }
     }
 
+    public T? GetOrDefault<T>(IPlayer player, string key, T defaultValue)
+    {
+        return GetOrDefault((long)player.SteamID, key, defaultValue);
+    }
+
+    public T? GetOrDefault<T>(long steamid, string key, T defaultValue)
+    {
+        if (!Has(steamid, key))
+        {
+            Set(steamid, key, defaultValue);
+            return defaultValue;
+        }
+        else return Get<T>(steamid, key);
+    }
+
     public bool Has(IPlayer player, string key)
     {
         return Has((long)player.SteamID, key);
