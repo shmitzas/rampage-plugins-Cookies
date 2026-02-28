@@ -10,7 +10,7 @@ using SwiftlyS2.Shared.Plugins;
 
 namespace Cookies;
 
-[PluginMetadata(Id = "Cookies", Version = "1.0.5", Name = "Cookies", Author = "Swiftly Development Team")]
+[PluginMetadata(Id = "Cookies", Version = "1.0.6", Name = "Cookies", Author = "Swiftly Development Team")]
 public partial class Cookies : BasePlugin
 {
     private ConcurrentDictionary<long, Dictionary<string, object>> CachedCookies = new();
@@ -54,9 +54,9 @@ public partial class Cookies : BasePlugin
         if (!loaded)
         {
             loaded = true;
-            Task.Run(() =>
+            Task.Run(async () =>
             {
-                ServerCookiesAPIv1.Load();
+                await ServerCookiesAPIv1.Load();
             });
         }
     }
@@ -66,14 +66,14 @@ public partial class Cookies : BasePlugin
     {
         var playerid = @event.PlayerId;
 
-        Task.Run(() =>
+        Task.Run(async () =>
         {
             if (PlayerCookiesAPIv1 == null) return;
 
             var player = Core.PlayerManager.GetPlayer(playerid);
             if (player == null) return;
 
-            PlayerCookiesAPIv1.Load(player);
+            await PlayerCookiesAPIv1.Load(player);
         });
     }
 
@@ -87,11 +87,11 @@ public partial class Cookies : BasePlugin
 
         var steamid = player.SteamID;
 
-        Task.Run(() =>
+        Task.Run(async () =>
         {
             if (PlayerCookiesAPIv1 == null) return;
 
-            PlayerCookiesAPIv1.Save((long)steamid);
+            await PlayerCookiesAPIv1.Save((long)steamid);
 
             CachedCookies.TryRemove((long)steamid, out _);
             playerBySteamId.TryRemove((long)steamid, out _);
@@ -100,22 +100,24 @@ public partial class Cookies : BasePlugin
 
     public override void Load(bool hotReload)
     {
-        if (saveTaskCancellationTokenSource != null) saveTaskCancellationTokenSource.Cancel();
+        saveTaskCancellationTokenSource?.Cancel();
 
-        saveTaskCancellationTokenSource = Core.Scheduler.RepeatBySeconds(1f, () =>
+        saveTaskCancellationTokenSource = Core.Scheduler.RepeatBySeconds(5f, () =>
         {
-            Task.Run(() =>
+            Task.Run(async () =>
             {
+                if (PlayerCookiesAPIv1 == null || ServerCookiesAPIv1 == null) return;
+
                 while (SaveQueue.TryDequeue(out var steamid))
                 {
-                    if (steamid == -1) ServerCookiesAPIv1?.Save();
+                    if (steamid == -1) await ServerCookiesAPIv1.Save();
                     else
                     {
                         var player = Core.PlayerManager.GetAllPlayers().FirstOrDefault(p => p.IsValid && (long)p.SteamID == steamid);
 
                         if (player == null) continue;
 
-                        PlayerCookiesAPIv1?.Save(player);
+                        await PlayerCookiesAPIv1.Save(player);
                     }
                 }
             });

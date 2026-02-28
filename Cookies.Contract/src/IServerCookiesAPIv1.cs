@@ -48,10 +48,10 @@ public interface IServerCookiesAPIv1
     /// <summary>
     /// Loads the server's cookies into memory.
     /// </summary>
-    public void Load();
+    public Task Load();
 
     /// <summary>
     /// Saves the server's cookies to the database.
     /// </summary>
-    public void Save();
+    public Task Save();
 }

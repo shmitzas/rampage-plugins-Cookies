@@ -174,11 +174,11 @@ public class PlayerCookiesAPIv1 : IPlayerCookiesAPIv1
         }
     }
 
-    public void Load(IPlayer player)
+    public async Task Load(IPlayer player)
     {
         var connection = core.Database.GetConnection("cookies");
 
-        var users = connection.Select<PlayerCookie>(u => u.SteamId64 == (long)player.SteamID);
+        var users = await connection.SelectAsync<PlayerCookie>(u => u.SteamId64 == (long)player.SteamID);
         var user = users.FirstOrDefault();
 
         if (user == null)
@@ -188,7 +188,7 @@ public class PlayerCookiesAPIv1 : IPlayerCookiesAPIv1
                 SteamId64 = (long)player.SteamID,
                 Data = []
             };
-            var id = connection.Insert(user);
+            var id = await connection.InsertAsync(user);
             user.Id = (ulong)id;
         }
 
@@ -196,16 +196,18 @@ public class PlayerCookiesAPIv1 : IPlayerCookiesAPIv1
         playerBySteamId[(long)player.SteamID] = player;
     }
 
-    public void Save(IPlayer player)
+    public async Task Save(IPlayer player)
     {
-        Save((long)player.SteamID);
+        if (!player.IsValid) return;
+
+        await Save((long)player.SteamID);
     }
 
-    public void Save(long steamid)
+    public async Task Save(long steamid)
     {
         var connection = core.Database.GetConnection("cookies");
 
-        var users = connection.Select<PlayerCookie>(u => u.SteamId64 == steamid);
+        var users = await connection.SelectAsync<PlayerCookie>(u => u.SteamId64 == steamid);
         var user = users.FirstOrDefault();
 
         if (user == null)
@@ -215,7 +217,7 @@ public class PlayerCookiesAPIv1 : IPlayerCookiesAPIv1
                 SteamId64 = steamid,
                 Data = []
             };
-            var id = connection.Insert(user);
+            var id = await connection.InsertAsync(user);
             user.Id = (ulong)id;
         }
 
@@ -224,7 +226,7 @@ public class PlayerCookiesAPIv1 : IPlayerCookiesAPIv1
             user.Data = data;
         }
 
-        connection.Update(user);
+        await connection.UpdateAsync(user);
     }
 
     public void Set<T>(IPlayer player, string key, T value)

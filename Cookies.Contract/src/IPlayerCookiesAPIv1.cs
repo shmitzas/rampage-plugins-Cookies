@@ -101,17 +101,17 @@ public interface IPlayerCookiesAPIv1
     /// Loads the player's cookies into memory.
     /// </summary>
     /// <param name="player">The player whose cookies should be loaded.</param>
-    public void Load(IPlayer player);
+    public Task Load(IPlayer player);
 
     /// <summary>
     /// Saves the player's cookies to the database.
     /// </summary>
     /// <param name="player">The player whose cookies should be saved.</param>
-    public void Save(IPlayer player);
+    public Task Save(IPlayer player);
 
     /// <summary>
     /// Saves the player's cookies to the database by steamid.
     /// </summary>
     /// <param name="steamid">The steamid of the player.</param>
-    public void Save(long steamid);
+    public Task Save(long steamid);
 }

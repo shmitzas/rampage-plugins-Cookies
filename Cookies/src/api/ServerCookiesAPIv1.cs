@@ -22,9 +22,9 @@ public class ServerCookiesAPIv1 : IServerCookiesAPIv1
 
     public void Clear()
     {
-        if (CachedCookies.ContainsKey(-1))
+        if (CachedCookies.TryGetValue(-1, out Dictionary<string, object>? value))
         {
-            CachedCookies[-1].Clear();
+            value.Clear();
             if (!SaveQueue.Contains(-1))
             {
                 SaveQueue.Enqueue(-1);
@@ -75,11 +75,11 @@ public class ServerCookiesAPIv1 : IServerCookiesAPIv1
         return CachedCookies.ContainsKey(-1) && CachedCookies[-1].ContainsKey(key);
     }
 
-    public void Load()
+    public async Task Load()
     {
         var connection = Core.Database.GetConnection("cookies");
 
-        var users = connection.Select<PlayerCookie>(u => u.SteamId64 == -1);
+        var users = await connection.SelectAsync<PlayerCookie>(u => u.SteamId64 == -1);
         var user = users.FirstOrDefault();
 
         if (user == null)
@@ -89,18 +89,18 @@ public class ServerCookiesAPIv1 : IServerCookiesAPIv1
                 SteamId64 = -1,
                 Data = []
             };
-            var id = connection.Insert(user);
+            var id = await connection.InsertAsync(user);
             user.Id = (ulong)id;
         }
 
         CachedCookies[-1] = user.Data;
     }
 
-    public void Save()
+    public async Task Save()
     {
         var connection = Core.Database.GetConnection("cookies");
 
-        var users = connection.Select<PlayerCookie>(u => u.SteamId64 == -1);
+        var users = await connection.SelectAsync<PlayerCookie>(u => u.SteamId64 == -1);
         var user = users.FirstOrDefault();
 
         if (user == null)
@@ -110,7 +110,7 @@ public class ServerCookiesAPIv1 : IServerCookiesAPIv1
                 SteamId64 = -1,
                 Data = []
             };
-            var id = connection.Insert(user);
+            var id = await connection.InsertAsync(user);
             user.Id = (ulong)id;
         }
 
@@ -119,7 +119,7 @@ public class ServerCookiesAPIv1 : IServerCookiesAPIv1
             user.Data = data;
         }
 
-        connection.Update(user);
+        await connection.UpdateAsync(user);
     }
 
     public void Set<T>(string key, T value)
